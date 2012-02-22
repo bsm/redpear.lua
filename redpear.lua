@@ -1,0 +1,6 @@
+require 'vendor.middleclass.middleclass'
+require 'vendor.redis-lua.src.redis'
+inspect = require 'vendor.inspect'
+require 'lib.Store'
+require 'lib.store.Base'
+require 'lib.store.Set'

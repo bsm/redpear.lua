@@ -1,0 +1,1 @@
+Store = class('redpear.Store')
