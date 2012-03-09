@@ -20,7 +20,7 @@ context('Set', function()
     assert_equal('redpear.store.Set', redpear.store.Set.name)
   end)
 
-  test('is a Store.Base', function()
+  test('is a Base', function()
     assert_equal(redpear.store.Base, redpear.store.Set.super)
   end)
 
@@ -72,6 +72,11 @@ context('Set', function()
     assert_tables({'1', '2', '3'}, tab)
   end)
 
+  test('creates diffs', function()
+    local tab = set:diff('key2')
+    assert_tables({'2'}, tab)
+  end)
+
   test('creates and stores intersections', function()
     local set = set:interstore('key3', 'key2')
     assert(instanceOf(redpear.store.Set, set))
@@ -90,5 +95,13 @@ context('Set', function()
     assert_tables({'1', '2', '3'}, tab)
   end)
 
+  test('creates and stores diffs', function()
+    local set = set:diffstore('key3', 'key2')
+    assert(instanceOf(redpear.store.Set, set))
+    assert_equal('key3', set.key)
+
+    local tab = set:members()
+    assert_tables({'2'}, tab)
+  end)
 
 end)
