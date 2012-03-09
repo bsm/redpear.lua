@@ -39,7 +39,7 @@ end
 -- Useful in combination with e.g. `interstore`, `unionstore`, etc.
 -- @param conn Redis connection
 -- @param fun(key) function to perform on that key
-function Store.Base:temporary(conn, fun)
+function Store.Base.static:temporary(conn, fun)
   local key     = "temp:" .. random_string(20)
   local store   = self:new(key, conn)
   local ok, err = pcall(fun, store)
