@@ -87,3 +87,29 @@ end
 function Set:random()
   return self.conn:srandmember(self.key)
 end
+
+-- @param other a string key
+-- @return an intersection table with `other`
+function Set:inter(other)
+  return self.conn:sinter(self.key, other)
+end
+
+-- @param other a string key
+-- @return a union table with `other`
+function Set:union(other)
+  return self.conn:sunion(self.key, other)
+end
+
+-- @param multiple(string) other keys
+-- @return an intersection Set stored in `target`
+function Set:interstore(target, ...)
+  self.conn:sinterstore(target, self.key, ...)
+  return self.class:new(target, self.conn)
+end
+
+-- @param multiple(string) other keys
+-- @return an union Set stored in `target`
+function Set:unionstore(target, ...)
+  self.conn:sunionstore(target, self.key, ...)
+  return self.class:new(target, self.conn)
+end

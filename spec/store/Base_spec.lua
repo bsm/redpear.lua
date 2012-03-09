@@ -1,4 +1,4 @@
-require 'redpear'
+require 'spec.helper'
 
 context('Base', function()
 
@@ -6,7 +6,7 @@ context('Base', function()
     local params = { host = '127.0.0.1', port = 6379 }
     redis = Redis.connect(params)
     redis:select(9)  -- for testing purposes
-    redis:del('key') -- flush before each test
+    redis:flushdb()
     store = redpear.store.Base:new('key', redis)
   end)
 
