@@ -1,25 +1,17 @@
 require 'redpear'
 
-context('Store', function()
-
-  test('is correctly setup', function()
-    assert_type(redpear.Store, 'table')
-  end)
-
-end)
-
-context('Store.Base', function()
+context('Base', function()
 
   before(function()
     local params = { host = '127.0.0.1', port = 6379 }
     redis = Redis.connect(params)
     redis:select(9)  -- for testing purposes
     redis:del('key') -- flush before each test
-    store = redpear.Store.Base:new('key', redis)
+    store = redpear.store.Base:new('key', redis)
   end)
 
   test('is correctly setup', function()
-    assert_equal(redpear.Store.Base.name, 'redpear.Store.Base')
+    assert_equal('redpear.store.Base', store.class.name)
   end)
 
   test('constructor accepts key and connection', function()
@@ -44,18 +36,18 @@ context('Store.Base', function()
 
     test('creates temporary keys', function()
       local key  = nil
-      local temp = redpear.Store.Set:temporary(redis, function(store)
+      local temp = redpear.store.Set:temporary(redis, function(store)
         key = store.key
       end)
 
-      assert_equal(redpear.Store.Set, temp.class)
+      assert(instanceOf(redpear.store.Set, temp))
       assert_match("temp:%w+", key)
       assert_equal(key, temp.key)
     end)
 
     test('performs redis block operations', function()
       local a, b = nil, nil
-      redpear.Store.Set:temporary(redis, function(store)
+      redpear.store.Set:temporary(redis, function(store)
         a = store:exists()
         redis:set(store.key, "VALUE")
         b = store:exists()
@@ -66,7 +58,7 @@ context('Store.Base', function()
 
     test('removes key afterwards', function()
       local key = nil
-      redpear.Store.Set:temporary(redis, function(store)
+      redpear.store.Set:temporary(redis, function(store)
         key = store.key
         redis:set(store.key, "VALUE")
       end)
@@ -76,7 +68,7 @@ context('Store.Base', function()
     test('re-raises errors in the block', function()
       local key = nil
       local ok, err = pcall(function()
-        redpear.Store.Set:temporary(redis, function(store)
+        redpear.store.Set:temporary(redis, function(store)
           key = store.key
           error("something!")
         end)

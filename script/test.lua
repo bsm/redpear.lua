@@ -7,7 +7,7 @@ local params = {
 
 local redis = Redis.connect(params)
 
-set = Store.Set:new('key', redis)
+set = redpear.store.Set:new('key', redis)
 set:add('1')
 
 print(inspect(set:members()))

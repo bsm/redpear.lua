@@ -1,13 +1,13 @@
 require 'redpear'
 
-context('Store.Set', function()
+context('Set', function()
 
   test('is correctly setup', function()
-    assert_equal(redpear.Store.Set.name, 'redpear.Store.Set')
+    assert_equal('redpear.store.Set', redpear.store.Set.name)
   end)
 
   test('is a Store.Base', function()
-    assert_equal(redpear.Store.Set.super, redpear.Store.Base)
+    assert_equal(redpear.store.Base, redpear.store.Set.super)
   end)
 
   context('Redis access', function()
@@ -21,7 +21,7 @@ context('Store.Set', function()
       redis:sadd('key', 'elem1')
       redis:sadd('key', 'elem2')
 
-      set = redpear.Store.Set:new('key', redis)
+      set = redpear.store.Set:new('key', redis)
     end)
 
     test('returns all members', function()
