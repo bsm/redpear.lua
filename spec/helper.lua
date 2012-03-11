@@ -1,7 +1,6 @@
-require 'redpear'
-
 inspect = require 'spec.inspect'
-
+require 'redis'
+require 'redpear'
 
 local function compare_tables(t1, t2)
   local ty1 = type(t1)

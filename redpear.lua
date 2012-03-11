@@ -1,5 +1,4 @@
 require 'middleclass'
-local Redis = require 'redis'
 
 local urandom = io.open("/dev/urandom", "rb")
 local function random_string(length)
