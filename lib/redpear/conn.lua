@@ -28,4 +28,9 @@ function M:zset(key)
   return self:sorted_set(key)
 end
 
+-- @return [redis.store.hash] a hash store
+function M:hash(key)
+  return store.hash:new(key, self.conn)
+end
+
 return M

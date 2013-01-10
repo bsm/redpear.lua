@@ -25,4 +25,9 @@ context('redpear.conn', function()
     assert_equal(subject:zset('key'):score(1), 1)
   end)
 
+  test('returns hashes', function()
+    redis:hset('key', 'f1', '1')
+    assert_equal(subject:hash('key'):length(), 1)
+  end)
+
 end)
