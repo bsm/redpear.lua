@@ -1,6 +1,4 @@
-inspect = require 'spec.inspect'
-require 'redis'
-require 'redpear'
+package.path  = './spec/support/?.lua;./lib/?.lua;;' .. package.path
 
 local function compare_tables(t1, t2)
   local ty1 = type(t1)
@@ -26,3 +24,19 @@ telescope.make_assertion("tables", function(_, a, b)
 end, function(a, b)
   return compare_tables(a, b)
 end)
+
+-- Add global callbacks.
+telescope.run_original = telescope.run
+telescope.run = function(contexts, callbacks, test_pattern)
+
+  callbacks.before = function()
+    inspect = require 'inspect'
+    redis   = require('redis').connect({ host = '127.0.0.1', port = 6379 })
+    redis:select(9)  -- for testing purposes
+  end
+
+  callbacks.after = function()
+    redis:flushdb()
+  end
+  return telescope.run_original(contexts, callbacks, test_pattern)
+end
