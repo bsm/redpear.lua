@@ -1,0 +1,42 @@
+package.path  = './spec/support/?.lua;./lib/?.lua;;' .. package.path
+
+local function compare_tables(t1, t2)
+  local ty1 = type(t1)
+  local ty2 = type(t2)
+  if ty1 ~= ty2 then return false end
+  -- non-table types can be directly compared
+  if ty1 ~= 'table' and ty2 ~= 'table' then return t1 == t2 end
+  -- as well as tables which have the metamethod __eq
+  local mt = getmetatable(t1)
+  for k1,v1 in pairs(t1) do
+  local v2 = t2[k1]
+  if v2 == nil or not compare_tables(v1,v2) then return false end
+  end
+  for k2,v2 in pairs(t2) do
+  local v1 = t1[k2]
+  if v1 == nil or not compare_tables(v1,v2) then return false end
+  end
+  return true
+end
+
+telescope.make_assertion("tables", function(_, a, b)
+  return "Expected table to be " .. inspect(a) .. ", but was " .. inspect(b)
+end, function(a, b)
+  return compare_tables(a, b)
+end)
+
+-- Add global callbacks.
+telescope.run_original = telescope.run
+telescope.run = function(contexts, callbacks, test_pattern)
+
+  callbacks.before = function()
+    inspect = require 'inspect'
+    redis   = require('redis').connect({ host = '127.0.0.1', port = 6379 })
+    redis:select(9)  -- for testing purposes
+  end
+
+  callbacks.after = function()
+    redis:flushdb()
+  end
+  return telescope.run_original(contexts, callbacks, test_pattern)
+end
