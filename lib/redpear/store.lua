@@ -272,4 +272,107 @@ function M.sorted_set:unionstore(target, count, ...)
 end
 
 
+-------------------------------------
+-- class redpear.store.hash
+-------------------------------------
+M.hash = setmetatable({}, { __index = M.base })
+
+-- @return the number of items in the hash
+function M.hash:length()
+  return self.conn:hlen(self.key)
+end
+
+-- @return the table with all keys and values
+function M.hash:all()
+  return self.conn:hgetall(self.key)
+end
+
+-- @return true, if empty
+function M.hash:empty()
+  return self:length() == 0
+end
+
+-- @param key hash key to check
+-- @return true, if key exists
+function M.hash:has_key(key)
+  return self.conn:hexists(self.key, key)
+end
+
+-- @param kek hash key to delete
+function M.hash:delete(key)
+  return self.conn:hdel(self.key, key) == 1
+end
+
+-- @see value/1 and values_at/n
+-- @return value for given key
+function M.hash:get(...)
+  local keys = {...}
+  if #keys == 1 then
+    return self:value(keys[1])
+  else
+    return self:values_at(...)
+  end
+end
+
+-- @param key hash key to fetch the value for
+-- @return value for given key
+function M.hash:value(key)
+  return self.conn:hget(self.key, key)
+end
+
+-- @param keys hash keys to fetch the values for
+-- @return table of values
+function M.hash:values_at(keys, ...)
+  if type(keys) ~= "table" then keys = {keys, ...} end
+  return self.conn:hmget(self.key, keys)
+end
+
+-- @param key hash key to fetch the value for
+-- @return value for given key
+function M.hash:set(...)
+  local args = {...}
+  assert(type(args[1]) == 'table' or #args % 2 == 0, "invalid arguments")
+
+  if #args == 2 then
+    return self.conn:hset(self.key, ...)
+  elseif #args % 2 == 0 then
+    return self.conn:hmset(self.key, ...)
+  else
+    local kvkv = {}
+    for k,v in pairs(args[1]) do
+      kvkv[#kvkv+1] = k
+      kvkv[#kvkv+1] = v
+    end
+
+    return self.conn:hmset(self.key, unpack(kvkv))
+  end
+end
+function M.hash:update(...)
+  return self:set(...)
+end
+
+-- @return table of all keys
+function M.hash:keys()
+  return self.conn:hkeys(self.key)
+end
+
+-- @return table of all values
+function M.hash:values()
+  return self.conn:hvals(self.key)
+end
+
+-- @param key hash key to increment
+-- @param value the increment value, defaults to 1
+function M.hash:increment(key, value)
+  value = value or 1
+  return self.conn:hincrby(self.key, key, value)
+end
+
+-- @param key hash key to decrement
+-- @param value the decrement value, defaults to 1
+function M.hash:decrement(key, value)
+  value = value or 1
+  return self:increment(key, -value)
+end
+
 return M
