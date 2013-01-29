@@ -28,7 +28,13 @@ end
 
 -- Check existence
 function M.base:exists()
-  return self.conn:exists(self.key)
+  local res, err = self.conn:exists(self.key)
+  if res == true or tonumber(res) == 1 then
+    return true, err
+  elseif res == false or tonumber(res) == 0 then
+    return false, err
+  end
+  return res, err
 end
 
 -- Deletes the key
