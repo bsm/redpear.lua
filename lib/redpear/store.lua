@@ -375,4 +375,71 @@ function M.hash:decrement(key, value)
   return self:increment(key, -value)
 end
 
+-------------------------------------
+-- class redpear.store.list
+-------------------------------------
+M.list = setmetatable({}, { __index = M.base })
+
+-- @return [table] all the items in the list
+function M.list:all()
+  return self:range(0, - 1)
+end
+
+-- @param [number] start
+-- @param [number] finish
+-- @return [table] items
+function M.list:range(start, finish)
+  if type(start) ~= 'number' or type(finish) ~= 'number' then
+    return {}
+  end
+  return self.conn:lrange(self.key, start, finish) or {}
+end
+
+-- @param [number] start
+-- @param [number] finish
+-- @return [boolean] true if the results where removed
+function M.list:trim(start, finish)
+  return self.conn:ltrim(self.key, start, finish)
+end
+
+-- @return [number] the numbers of items in the list
+function M.list:length()
+  return self.conn:llen(self.key)
+end
+
+-- Add an item to the end of the list
+-- @return [table] all the values
+function M.list:push(item)
+  self.conn:rpush(self.key, item)
+  return self:all()
+end
+
+-- Removes and returns the last item in the list
+-- return [string]
+function M.list:pop()
+  return self.conn:rpop(self.key)
+end
+
+-- Prepends a single item
+-- @return [table] all the items in the list
+function M.list:unshift(item)
+  self.conn:lpush(self.key, item)
+  return self:all()
+end
+
+-- Removes and returns the first item in the list
+-- return [string]
+function M.list:shift()
+  return self.conn:lpop(self.key)
+end
+
+-- Removes item from the list
+-- @param [string] item, the item to remove
+-- @param [number] count, number of instances to delete
+-- @return [number] the number of items removed
+function M.list:delete(item, count)
+  count = count or 0
+  return self.conn:lrem(self.key, count, item)
+end
+
 return M

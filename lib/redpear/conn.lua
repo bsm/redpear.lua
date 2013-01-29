@@ -33,4 +33,10 @@ function M:hash(key)
   return store.hash:new(key, self.conn)
 end
 
+-- @return [redis.store.hash] a hash store
+function M:list(key)
+  return store.list:new(key, self.conn)
+end
+
+
 return M
