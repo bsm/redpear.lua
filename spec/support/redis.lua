@@ -171,21 +171,6 @@ local function mset_filter_args(client, command, ...)
     request.multibulk(client, command, arguments)
 end
 
-local function hash_multi_request_builder(builder_callback)
-    return function(client, command, ...)
-        local args, arguments = {...}, { }
-        if #args == 2 then
-            table.insert(arguments, args[1])
-            for k, v in pairs(args[2]) do
-                builder_callback(arguments, k, v)
-            end
-        else
-            arguments = args
-        end
-        request.multibulk(client, command, arguments)
-    end
-end
-
 local function parse_info(response)
     local info = {}
     local current = info
@@ -1034,10 +1019,7 @@ redis.commands = {
         response = toboolean
     }),
     hmset            = command('HMSET', {       -- >= 2.0
-        request  = hash_multi_request_builder(function(args, k, v)
-            table.insert(args, k)
-            table.insert(args, v)
-        end),
+        request  = request.multibulk,
     }),
     hincrby          = command('HINCRBY'),      -- >= 2.0
     hincrbyfloat     = command('HINCRBYFLOAT', {-- >= 2.6
@@ -1047,9 +1029,7 @@ redis.commands = {
     }),
     hget             = command('HGET'),         -- >= 2.0
     hmget            = command('HMGET', {       -- >= 2.0
-        request  = hash_multi_request_builder(function(args, k, v)
-            table.insert(args, v)
-        end),
+        request  = request.multibulk,
     }),
     hdel             = command('HDEL'),        -- >= 2.0
     hexists          = command('HEXISTS', {     -- >= 2.0

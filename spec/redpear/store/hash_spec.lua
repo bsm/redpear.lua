@@ -36,7 +36,7 @@ context('redpear.store.hash', function()
   test('values_at', function()
     assert_tables(subject:values_at("f1"), {'10'})
     assert_tables(subject:values_at("f4", "f2"), {nil, '20'})
-    assert_tables(subject:values_at({"f4", "f2"}), {nil, '20'})
+    assert_tables(subject:values_at("f4", "f2"), {nil, '20'})
   end)
 
   test('set', function()

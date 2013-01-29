@@ -328,9 +328,8 @@ end
 
 -- @param keys hash keys to fetch the values for
 -- @return table of values
-function M.hash:values_at(keys, ...)
-  if type(keys) ~= "table" then keys = {keys, ...} end
-  return self.conn:hmget(self.key, keys)
+function M.hash:values_at(...)
+  return self.conn:hmget(self.key, ...)
 end
 
 -- @param key hash key to fetch the value for
