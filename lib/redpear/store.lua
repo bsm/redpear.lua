@@ -395,10 +395,7 @@ end
 -- @param [number] finish
 -- @return [table] items
 function M.list:range(start, finish)
-  if type(start) ~= 'number' or type(finish) ~= 'number' then
-    return {}
-  end
-  return self.conn:lrange(self.key, start, finish) or {}
+  return self.conn:lrange(self.key, tonumber(start), tonumber(finish))
 end
 
 -- @param [number] start
@@ -416,8 +413,7 @@ end
 -- Add an item to the end of the list
 -- @return [table] all the values
 function M.list:push(item)
-  self.conn:rpush(self.key, item)
-  return self:all()
+  return self.conn:rpush(self.key, item)
 end
 
 -- Removes and returns the last item in the list
@@ -429,8 +425,7 @@ end
 -- Prepends a single item
 -- @return [table] all the items in the list
 function M.list:unshift(item)
-  self.conn:lpush(self.key, item)
-  return self:all()
+  return self.conn:lpush(self.key, item)
 end
 
 -- Removes and returns the first item in the list
@@ -444,8 +439,7 @@ end
 -- @param [number] count, number of instances to delete
 -- @return [number] the number of items removed
 function M.list:delete(item, count)
-  count = count or 0
-  return self.conn:lrem(self.key, count, item)
+  return self.conn:lrem(self.key, tonumber(count) or 0, item)
 end
 
 return M
