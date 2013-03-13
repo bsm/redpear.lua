@@ -58,6 +58,21 @@ function base:clear()
   self:purge()
 end
 
+-- Expire in `seconds`
+function base:expire(seconds)
+  self.conn:expire(self.key, seconds)
+end
+
+-- Alias for expire
+function base:expire_in(seconds)
+  self:expire(seconds)
+end
+
+-- Expire at `timestamp`
+function base:expire_at(timestamp)
+  self.conn:expireat(self.key, timestamp)
+end
+
 -- Creates and yields over a temporary key.
 -- Useful in combination with e.g. `interstore`, `unionstore`, etc.
 -- @param conn Redis connection
