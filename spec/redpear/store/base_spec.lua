@@ -1,4 +1,5 @@
 require 'spec.helper'
+require 'os'
 
 context('redpear.store.base', function()
 
@@ -17,6 +18,33 @@ context('redpear.store.base', function()
     assert_not_nil(redis:get('key'))
     subject:purge()
     assert_nil(redis:get('key'))
+  end)
+
+  test('has ttl', function()
+    assert_equal(subject:ttl(), -1)
+
+    redis:set('key', 'value')
+    assert_equal(subject:ttl(), -1)
+
+    redis:expire('key', 100)
+    assert_true(subject:ttl() >= 99 and subject:ttl() <= 100)
+  end)
+
+  test('can expire', function()
+    assert_equal(subject:ttl(), -1)
+
+    subject:expire(100)
+    assert_equal(subject:ttl(), -1)
+
+    redis:set('key', 'value')
+    subject:expire(100)
+    assert_true(subject:ttl() >= 99 and subject:ttl() <= 100)
+
+    subject:expire_in(200)
+    assert_true(subject:ttl() >= 199 and subject:ttl() <= 200)
+
+    subject:expire_at(os.time() + 300)
+    assert_true(subject:ttl() >= 299 and subject:ttl() <= 300)
   end)
 
   test('check existence', function()

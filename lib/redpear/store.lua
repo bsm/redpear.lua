@@ -73,6 +73,11 @@ function base:expire_at(timestamp)
   self.conn:expireat(self.key, timestamp)
 end
 
+-- Returns the `ttl` in seconds
+function base:ttl()
+  return self.conn:ttl(self.key)
+end
+
 -- Creates and yields over a temporary key.
 -- Useful in combination with e.g. `interstore`, `unionstore`, etc.
 -- @param conn Redis connection
