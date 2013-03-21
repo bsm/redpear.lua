@@ -16,7 +16,7 @@ context('redpear.store.base', function()
   test('can purge keys from the DB', function()
     redis:set('key', 'value')
     assert_not_nil(redis:get('key'))
-    subject:purge()
+    assert_equal(subject:purge(), 1)
     assert_nil(redis:get('key'))
   end)
 
@@ -43,7 +43,7 @@ context('redpear.store.base', function()
     subject:expire_in(200)
     assert_true(subject:ttl() >= 199 and subject:ttl() <= 200)
 
-    subject:expire_at(os.time() + 300)
+    assert_true(subject:expire_at(os.time() + 300))
     assert_true(subject:ttl() >= 299 and subject:ttl() <= 300)
   end)
 

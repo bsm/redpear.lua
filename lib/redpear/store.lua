@@ -50,27 +50,27 @@ end
 
 -- Deletes the key
 function base:purge()
-  self.conn:del(self.key)
+  return self.conn:del(self.key)
 end
 
 -- Alias for purge
 function base:clear()
-  self:purge()
+  return self:purge()
 end
 
 -- Expire in `seconds`
 function base:expire(seconds)
-  self.conn:expire(self.key, seconds)
+  return self.conn:expire(self.key, seconds)
 end
 
 -- Alias for expire
 function base:expire_in(seconds)
-  self:expire(seconds)
+  return self:expire(seconds)
 end
 
 -- Expire at `timestamp`
 function base:expire_at(timestamp)
-  self.conn:expireat(self.key, timestamp)
+  return self.conn:expireat(self.key, timestamp)
 end
 
 -- Returns the `ttl` in seconds
