@@ -1,19 +1,27 @@
 require 'spec.helper'
 
 context('redpear.store.set', function()
+  local redis = require('redis'):new()
+  local klass = require("redpear.store").set
+  local subject
 
   before(function()
-    klass   = require("redpear.store").set
-    subject = klass:new('key1', redis)
-
+    redis:connect('127.0.0.1', 6379)
+    redis:select(9)  -- for testing purposes
     redis:sadd('key1', '1')
     redis:sadd('key1', '2')
     redis:sadd('key2', '1')
     redis:sadd('key2', '3')
+
+    subject = klass:new('key1', redis)
+  end)
+
+  after(function()
+    redis:flushdb()
   end)
 
   test('is a base', function()
-    assert_equal(subject:exists(), true)
+    assert_true(subject:exists())
   end)
 
   test('returns all members', function()

@@ -1,13 +1,21 @@
 require 'spec.helper'
 
 context('redpear.store.hash', function()
+  local redis = require('redis'):new()
+  local klass = require("redpear.store").hash
+  local subject
 
   before(function()
-    klass   = require("redpear.store").hash
-    subject = klass:new('key1', redis)
-
+    redis:connect('127.0.0.1', 6379)
+    redis:select(9)  -- for testing purposes
     redis:hmset('key1', 'f1', 10, 'f2', 20, 'f3', 30)
     redis:hmset('key2', 'f1', 10, 'f4', 40)
+
+    subject = klass:new('key1', redis)
+  end)
+
+  after(function()
+    redis:flushdb()
   end)
 
   test('inherits from base', function()
@@ -25,8 +33,8 @@ context('redpear.store.hash', function()
   test('get', function()
     assert_equal(subject:get("f1"), '10')
     assert_tables(subject:get("f1", "f3"), {'10', '30'})
-    assert_equal(subject:get("f4"), nil)
-    assert_tables(subject:get("f4", "f2"), {nil, '20'})
+    assert_equal(subject:get("f4"), null)
+    assert_tables(subject:get("f4", "f2"), {null, '20'})
   end)
 
   test('value', function()
@@ -35,29 +43,29 @@ context('redpear.store.hash', function()
 
   test('values_at', function()
     assert_tables(subject:values_at("f1"), {'10'})
-    assert_tables(subject:values_at("f4", "f2"), {nil, '20'})
-    assert_tables(subject:values_at({"f4", "f2"}), {nil, '20'})
+    assert_tables(subject:values_at("f4", "f2"), {null, '20'})
+    assert_tables(subject:values_at({"f4", "f2"}), {null, '20'})
   end)
 
   test('set', function()
-    assert_equal(subject:set("f1", 25), false)
+    assert_false(subject:set("f1", 25))
     assert_tables(subject:all(), {f1='25', f2='20', f3='30'})
 
-    assert_equal(subject:set("f1", 25, "f4", 45), true)
+    assert_true(subject:set("f1", 25, "f4", 45))
     assert_tables(subject:all(), {f1='25', f2='20', f3='30', f4='45'})
 
-    assert_equal(subject:set({f5=50}), true)
+    assert_true(subject:set({f5=50}))
     assert_tables(subject:all(), {f1='25', f2='20', f3='30', f4='45', f5='50'})
   end)
 
   test('empty', function()
-    assert_equal(subject:empty(), false)
-    assert_equal(klass:new('key3', redis):empty(), true)
+    assert_false(subject:empty())
+    assert_true(klass:new('key3', redis):empty())
   end)
 
   test('has_key', function()
-    assert_equal(subject:has_key("f1"), true)
-    assert_equal(subject:has_key("f4"), false)
+    assert_true(subject:has_key("f1"))
+    assert_false(subject:has_key("f4"))
   end)
 
   test('keys', function()
@@ -69,9 +77,9 @@ context('redpear.store.hash', function()
   end)
 
   test('delete', function()
-    assert_equal(subject:delete("f1"), true)
+    assert_true(subject:delete("f1"))
     assert_equal(subject:length(), 2)
-    assert_equal(subject:delete("f4"), false)
+    assert_false(subject:delete("f4"))
   end)
 
   test('increment', function()

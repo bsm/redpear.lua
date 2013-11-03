@@ -1,10 +1,18 @@
 require 'spec.helper'
 
 context('redpear.conn', function()
+  local redis = require('redis'):new()
+  local klass = require("redpear.conn")
+  local subject
 
   before(function()
-    klass   = require("redpear.conn")
+    redis:connect('127.0.0.1', 6379)
+    redis:select(9)  -- for testing purposes
     subject = klass:new(redis)
+  end)
+
+  after(function()
+    redis:flushdb()
   end)
 
   test('returns values', function()

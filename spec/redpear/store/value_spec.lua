@@ -1,10 +1,18 @@
 require 'spec.helper'
 
 context('redpear.store.value', function()
+  local redis = require('redis'):new()
+  local klass = require("redpear.store").value
+  local subject
 
   before(function()
-    klass   = require("redpear.store").value
+    redis:connect('127.0.0.1', 6379)
+    redis:select(9)  -- for testing purposes
     subject = klass:new('key', redis)
+  end)
+
+  after(function()
+    redis:flushdb()
   end)
 
   test('inherits from base', function()

@@ -1,10 +1,19 @@
 require 'spec.helper'
 
 context('redpear.store.base', function()
+  local redis = require('redis'):new()
+  local klass = require("redpear.store").base
+  local subject
 
   before(function()
-    klass   = require("redpear.store").base
+    redis:connect('127.0.0.1', 6379)
+    redis:select(9)  -- for testing purposes
+
     subject = klass:new('key', redis)
+  end)
+
+  after(function()
+    redis:flushdb()
   end)
 
   test('constructor accepts key and connection', function()
@@ -16,7 +25,7 @@ context('redpear.store.base', function()
     redis:set('key', 'value')
     assert_not_nil(redis:get('key'))
     subject:purge()
-    assert_nil(redis:get('key'))
+    assert_equal(redis:get('key'), null)
   end)
 
   test('check existence', function()
@@ -31,10 +40,12 @@ context('redpear.store.base', function()
       local key  = nil
       local temp = klass:temporary(redis, function(store)
         key = store.key
+        assert_false(store:exists())
       end)
 
       assert_match("temp:%w+", key)
       assert_equal(key, temp.key)
+      assert_false(temp:exists())
     end)
 
     test('performs redis block operations', function()
@@ -54,7 +65,7 @@ context('redpear.store.base', function()
         key = store.key
         redis:set(store.key, "VALUE")
       end)
-      assert_false(redis:exists(key))
+      assert_equal(redis:exists(key), 0)
     end)
 
     test('re-raises errors in the block', function()
@@ -70,12 +81,12 @@ context('redpear.store.base', function()
       assert_not_blank(err)
 
       assert_not_nil(key)
-      assert_false(redis:exists(key))
+      assert_equal(redis:exists(key), 0)
     end)
 
     test('inheritable', function()
-      local klass = require("redpear.store").value
-      klass:temporary(redis, function(store)
+      local child = require("redpear.store").value
+      child:temporary(redis, function(store)
         redis:set(store.key, "VALUE")
         assert_equal(store:get(), "VALUE")
       end)
