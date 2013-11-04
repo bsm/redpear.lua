@@ -22,6 +22,7 @@ local function compare_tables(t1, t2)
   return true
 end
 
+local telescope = require 'telescope'
 telescope.make_assertion("tables", function(_, a, b)
   return "Expected table to be " .. inspect(b) .. ", but was " .. inspect(a)
 end, function(a, b)
