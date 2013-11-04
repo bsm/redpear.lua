@@ -1,5 +1,5 @@
 before_install:
  - sudo apt-get update -qq
- - sudo apt-get install -qq luajit luarocks liblua5.1-bitop0
+ - sudo apt-get install -qq luajit luarocks liblua5.1-bitop0 liblua5.1-socket2
  - sudo luarocks install telescope
 script: "make"
