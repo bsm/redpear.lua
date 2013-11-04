@@ -1,6 +1,7 @@
 require 'spec.helper'
 
 context('redpear.store.base', function()
+  local os    = require 'os'
   local redis = require('redis'):new()
   local klass = require("redpear.store").base
   local subject
@@ -24,8 +25,35 @@ context('redpear.store.base', function()
   test('can purge keys from the DB', function()
     redis:set('key', 'value')
     assert_not_nil(redis:get('key'))
-    subject:purge()
+    assert_equal(subject:purge(), 1)
     assert_equal(redis:get('key'), null)
+  end)
+
+  test('has ttl', function()
+    assert_equal(subject:ttl(), -1)
+
+    redis:set('key', 'value')
+    assert_equal(subject:ttl(), -1)
+
+    redis:expire('key', 100)
+    assert_true(subject:ttl() >= 99 and subject:ttl() <= 100)
+  end)
+
+  test('can expire', function()
+    assert_equal(subject:ttl(), -1)
+
+    subject:expire(100)
+    assert_equal(subject:ttl(), -1)
+
+    redis:set('key', 'value')
+    subject:expire(100)
+    assert_true(subject:ttl() >= 99 and subject:ttl() <= 100)
+
+    subject:expire_in(200)
+    assert_true(subject:ttl() >= 199 and subject:ttl() <= 200)
+
+    assert_true(subject:expire_at(os.time() + 300))
+    assert_true(subject:ttl() >= 299 and subject:ttl() <= 300)
   end)
 
   test('check existence', function()

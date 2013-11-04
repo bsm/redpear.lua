@@ -25,13 +25,12 @@ context('redpear.store.set', function()
   end)
 
   test('returns all members', function()
-    assert_equal(subject:members()[1], '1')
-    assert_equal(subject:members()[2], '2')
+    assert_tables(subject:members(), {'1', '2'})
   end)
 
   test('adds members', function()
     subject:add('3')
-    assert_equal(subject:members()[3], '3')
+    assert_tables(subject:members(), {'1', '2', '3'})
   end)
 
   test('counts members', function()
@@ -41,7 +40,7 @@ context('redpear.store.set', function()
 
   test('deletes members', function()
     subject:delete('2')
-    assert_nil(subject:members()[2])
+    assert_tables(subject:members(), {'1'})
   end)
 
   test('checks member inclusion', function()

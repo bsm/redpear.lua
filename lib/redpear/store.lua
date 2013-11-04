@@ -14,7 +14,6 @@ local urandom  = io.open("/dev/urandom", "rb")
 -------------------------------------
 -- module redpear.store
 -------------------------------------
--- module(...)
 local _M = {}
 
 -------------------------------------
@@ -59,6 +58,11 @@ function _M.base:purge()
   return self.conn:del(self.key)
 end
 
+-- Alias for purge
+function _M.base:clear()
+  return self:purge()
+end
+
 -- Expire in `seconds`
 function _M.base:expire(seconds)
   return self.conn:expire(self.key, seconds)
@@ -71,16 +75,12 @@ end
 
 -- Expire at `timestamp`
 function _M.base:expire_at(timestamp)
-  return self.conn:expireat(self.key, timestamp)
+  local res, err = self.conn:expireat(self.key, timestamp)
+  return to_bool(res), err
 end
 
 function _M.base:ttl()
   return self.conn:ttl(self.key)
-end
-
--- Alias for purge
-function _M.base:clear()
-  return self:purge()
 end
 
 -- Creates and yields over a temporary key.
@@ -448,7 +448,8 @@ end
 -- @param [number] finish
 -- @return [boolean] true if the results where removed
 function _M.list:trim(start, finish)
-  return self.conn:ltrim(self.key, start, finish)
+  local res, err = self.conn:ltrim(self.key, start, finish)
+  return to_bool(res), err
 end
 
 -- @return [number] the numbers of items in the list
