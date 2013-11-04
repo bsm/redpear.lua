@@ -1,5 +1,7 @@
 # Redpear (Lua Edition)
 
+[![Build Status](https://travis-ci.org/bsm/redpear.lua.png?branch=master)](https://travis-ci.org/bsm/redpear.lua)
+
 Simplistic object mapper for Redis/Lua
 
 ## Usage
